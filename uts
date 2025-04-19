@@ -1,0 +1,48 @@
+harus pake // kalau dalam mode delimitor tolol 
+create table mahasiswa (nim INT(11) primarykey,nama VARCHAR(255) NOT NULL,nilai_tugas float , nilai_uts float,nilai_uas float)
+insert into mahasiswa values (005,'rheno',76,78,89,88.7)
+
+2.)SELECT * 
+FROM mahasiswa 
+WHERE nilai_uts = (SELECT MAX(nilai_uts) FROM mahasiswa);
+
+3.) DELIMITER // 
+
+CREATE FUNCTION nilai_uts(min_uts FLOAT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE jumlah INT;
+    SELECT COUNT(*) INTO jumlah
+    FROM mahasiswa
+    WHERE nilai_uts >= min_uts;
+    RETURN jumlah;
+END //
+
+
+DELIMITER //
+
+4.) CREATE PROCEDURE SP4(IN nilai_lama FLOAT, IN nilai_baru INT)
+ BEGIN
+    UPDATE mahasiswa
+    SET nilai_uts = nilai_baru
+    WHERE nilai_uts = nilai_lama;
+
+    SELECT * FROM mahasiswa
+    WHERE nilai_uts = nilai_baru;
+END //
+
+5.)DELIMITER //
+
+CREATE TRIGGER Update_nilai_tugas
+BEFORE UPDATE ON mahasiswa
+FOR EACH ROW
+BEGIN
+    SET NEW.nilai_akhir = (0.3 * NEW.nilai_tugas) + 
+                          (0.3 * NEW.nilai_uts) + 
+                          (0.4 * NEW.nilai_uas);
+END //
+
+DELIMITER ;
+update mahasiswa set Nilai_Tugas=85 where NIM='001';
+update mahasiswa set Nilai_Tugas=70 where NIM='003';
